@@ -1,6 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SelectBudgetOptions, SelectTravelersList } from "@/constants/options";
+import {
+  AI_PROMPT,
+  SelectBudgetOptions,
+  SelectTravelersList,
+} from "@/constants/options";
+import { chatSession } from "@/service/AIModal";
 import React, { useEffect } from "react";
 import { useState } from "react";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
@@ -21,7 +26,7 @@ function CreateTrip() {
     console.log(formData);
   }, [formData]);
 
-  const onGenerateTrip = () => {
+  const onGenerateTrip = async () => {
     if (
       !formData?.budget ||
       !formData?.location ||
@@ -34,8 +39,23 @@ function CreateTrip() {
     }
     if (formData?.noOfDays > 15 || formData?.noOfDays <= 0) {
       toast("Please enter correct number of days between 1 to 15");
-      console.log(formData);
+      return;
     }
+
+    const FINAL_PROMPT = AI_PROMPT.replace(
+      "{location}",
+      formData?.location?.label
+    )
+      .replace("{noOfDays}", formData?.noOfDays)
+      .replace("{travelers}", formData?.travelers)
+      .replace("{budget}", formData?.budget)
+      .replace("{noOfDays}", formData?.noOfDays)
+      .replace("{travelers}", formData?.travelers)
+      .replace("{budget}", formData?.budget);
+    console.log(FINAL_PROMPT);
+
+    const result = await chatSession.sendMessage(FINAL_PROMPT);
+    console.log(result?.response?.text());
   };
   return (
     <div className="sm:px-10 md:px-32 lg:px-56 xl:px-72 px-5 mt-10">
