@@ -21,11 +21,15 @@ import {
 import { FcGoogle } from "react-icons/fc";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
+import { setDoc, doc } from "firebase/firestore";
+import { db } from "@/service/firbaseConfig";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 function CreateTrip() {
   const [place, setPlace] = useState();
   const [formData, setFormData] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [loading, setIsLoading] = useState(false);
   const handleInputChange = (name, value) => {
     setFormData({
       ...formData,
@@ -63,6 +67,7 @@ function CreateTrip() {
       toast("Please enter correct number of days between 1 to 15");
       return;
     }
+    setIsLoading(true);
     const FINAL_PROMPT = AI_PROMPT.replace(
       "{location}",
       formData?.location?.label
@@ -74,9 +79,21 @@ function CreateTrip() {
       .replace("{travelers}", formData?.travelers)
       .replace("{budget}", formData?.budget);
 
-    console.log(FINAL_PROMPT);
     const result = await chatSession.sendMessage(FINAL_PROMPT);
-    console.log(result?.response?.text());
+    setIsLoading(false);
+    saveAiTrip(result?.response?.text());
+  };
+  const saveAiTrip = async (tripData) => {
+    setIsLoading(true);
+    const user = JSON.parse(localStorage.getItem("user"));
+    const docId = Date.now().toString();
+    await setDoc(doc(db, "AITrips", docId), {
+      userSelection: formData,
+      tripData: JSON.parse(tripData),
+      userEmail: user?.email,
+      id: docId,
+    });
+    setIsLoading(false);
   };
   const getUserProfile = (tokenInfo) => {
     axios
@@ -174,7 +191,13 @@ function CreateTrip() {
         </div>
       </div>
       <div className="my-10 justify-end flex">
-        <Button onClick={onGenerateTrip}>Generate Trip</Button>
+        <Button disabled={loading} onClick={onGenerateTrip}>
+          {loading ? (
+            <AiOutlineLoading3Quarters className="h-7 w-7 animate-spin" />
+          ) : (
+            "Generate Trip"
+          )}
+        </Button>
       </div>
       <Dialog open={openDialog}>
         <DialogContent>
