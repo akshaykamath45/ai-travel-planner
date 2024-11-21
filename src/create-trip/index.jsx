@@ -10,11 +10,22 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { FcGoogle } from "react-icons/fc";
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
 
 function CreateTrip() {
   const [place, setPlace] = useState();
   const [formData, setFormData] = useState([]);
-
+  const [openDialog, setOpenDialog] = useState(false);
   const handleInputChange = (name, value) => {
     setFormData({
       ...formData,
@@ -26,7 +37,18 @@ function CreateTrip() {
     console.log(formData);
   }, [formData]);
 
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse) => {
+      getUserProfile(codeResponse);
+    },
+    onError: (error) => console.log(error),
+  });
   const onGenerateTrip = async () => {
+    const user = localStorage.getItem("user");
+    if (!user) {
+      setOpenDialog(true);
+      return;
+    }
     if (
       !formData?.budget ||
       !formData?.location ||
@@ -41,7 +63,6 @@ function CreateTrip() {
       toast("Please enter correct number of days between 1 to 15");
       return;
     }
-
     const FINAL_PROMPT = AI_PROMPT.replace(
       "{location}",
       formData?.location?.label
@@ -52,11 +73,33 @@ function CreateTrip() {
       .replace("{noOfDays}", formData?.noOfDays)
       .replace("{travelers}", formData?.travelers)
       .replace("{budget}", formData?.budget);
-    console.log(FINAL_PROMPT);
 
+    console.log(FINAL_PROMPT);
     const result = await chatSession.sendMessage(FINAL_PROMPT);
     console.log(result?.response?.text());
   };
+  const getUserProfile = (tokenInfo) => {
+    axios
+      .get(
+        `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenInfo?.access_token}`,
+            Accept: "Application/json",
+          },
+        }
+      )
+      .then((res) => {
+        console.log("Response:", res);
+        localStorage.setItem("user", JSON.stringify(res.data));
+        setOpenDialog(false);
+        onGenerateTrip();
+      })
+      .catch((error) => {
+        console.error("Error fetching user profile:", error);
+      });
+  };
+
   return (
     <div className="sm:px-10 md:px-32 lg:px-56 xl:px-72 px-5 mt-10">
       <h2 className="font-bold text-3xl">Tell us your travel preferences 🛫</h2>
@@ -133,6 +176,24 @@ function CreateTrip() {
       <div className="my-10 justify-end flex">
         <Button onClick={onGenerateTrip}>Generate Trip</Button>
       </div>
+      <Dialog open={openDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogDescription>
+              <img src="/logo.svg" />
+              <h2 className="font-bold text-lg mt-7">Sign In With Google</h2>
+              <p>Sign in to app with Google authentication security</p>
+              <Button
+                className="w-full mt-5 flex gap-4 items-center"
+                onClick={login}
+              >
+                <FcGoogle className="h-7 w-7" />
+                Sign In With Google
+              </Button>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
