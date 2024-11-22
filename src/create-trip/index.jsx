@@ -78,7 +78,6 @@ function CreateTrip() {
       .replace("{noOfDays}", formData?.noOfDays)
       .replace("{travelers}", formData?.travelers)
       .replace("{budget}", formData?.budget)
-      .replace("{noOfDays}", formData?.noOfDays)
       .replace("{travelers}", formData?.travelers)
       .replace("{budget}", formData?.budget);
 
