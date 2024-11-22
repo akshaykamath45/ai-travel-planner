@@ -40,9 +40,7 @@ function CreateTrip() {
     });
   };
 
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
+  useEffect(() => {}, [formData]);
 
   const login = useGoogleLogin({
     onSuccess: (codeResponse) => {
