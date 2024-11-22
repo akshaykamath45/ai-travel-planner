@@ -11,7 +11,7 @@ function PlacesToVisit({ trip }) {
             <h2 className="font-medium text-lg">Day {item.day}</h2>
             <div className="grid md:grid-cols-2 gap-5">
               {item.dayPlan.map((place, index) => (
-                <div>
+                <div key={index}>
                   <h2 className="font-medium text-sm text-[rgb(48,128,104)]">
                     {place?.timeTravel}
                   </h2>
