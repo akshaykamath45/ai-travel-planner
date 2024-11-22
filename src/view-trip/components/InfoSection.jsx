@@ -21,7 +21,7 @@ function InfoSection({ trip }) {
               {trip?.userSelection?.noOfDays}📅 Days
             </h2>
             <h2 className="p1 px-3 bg-gray-200 rounded-full text-gray-500 ">
-              {trip?.userSelection?.budget}💰 Budget
+              💰{trip?.userSelection?.budget} Budget
             </h2>
             <h2 className="p1 px-3 bg-gray-200 rounded-full text-gray-500 ">
               🧑‍🤝‍🧑 No of Travelers: {trip?.userSelection?.travelers}
