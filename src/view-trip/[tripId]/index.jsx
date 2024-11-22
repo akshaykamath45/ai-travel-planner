@@ -1,8 +1,10 @@
 import { db } from "@/service/firbaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import React, { useEffect } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
+import InfoSection from "../components/InfoSection";
 
 function ViewTrip() {
   const { tripId } = useParams();
@@ -25,7 +27,14 @@ function ViewTrip() {
       toast("No trip found with this id");
     }
   };
-  return <div></div>;
+  return (
+    <div className="p-10 md:px-20 lg:px-44 xl:px-56">
+      <InfoSection trip={trip} />
+      {/* {InformationSection}
+    {RecommendedHotels}
+    {DailyPlan} */}
+    </div>
+  );
 }
 
 export default ViewTrip;
