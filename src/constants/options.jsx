@@ -58,27 +58,41 @@ Generate a detailed travel plan for the following criteria:
 - **Travelers:** {travelers}  
 - **Budget:** {budget}  
 
-Provide the output in JSON format with the following details:
+Please provide the result in the following JSON format:
 
-1. **Hotels Options:**  
-   - Hotel Name  
-   - Address  
-   - Price (per night)  
-   - Image URL  
-   - Geo Coordinates (latitude and longitude)  
-   - Rating  
-   - Description  
-
-2. **Daily Itinerary (for {noOfDays} days):**  
-   - **Day-wise Plan:** Include a detailed schedule for each day.  
-   - **Places to Visit:**  
-     - Name of the Place  
-     - Description of the place  
-     - Image URL of the place  
-     - Geo Coordinates (latitude and longitude)  
-     - Ticket Pricing (if applicable)  
-   - **Travel Time:** Time to travel between locations.  
-   - **Best Visiting Time:** Ideal time to visit each location.  
+"hotelOptions": [
+      {
+        "hotelName": "<Hotel Name>",
+        "address": "<Hotel Address>",
+        "price": "<Price> per night",
+        "hotelImageURL": "<Hotel Image URL>",
+        "description": "<Hotel Description>",
+        "geoCoordinates": {
+          "latitude": <Latitude>,
+          "longitude": <Longitude>
+        },
+        "rating": <Rating>
+      }
+    ],
+"itinerary": [
+      {
+        "day": <Day Number>,
+        "dayPlan": [
+          {
+            "placeName": "<Place Name>",
+            "placeDetails": "<Place Details>",
+            "placeImageURL": "<Place Image URL>",
+            "geoCoordinates": {
+                "latitude": <Latitude>,
+                "longitude": <Longitude>
+            },
+            "ticketPricing": "<Ticket Pricing >",
+            "timeTravel": "<Time Travel>",
+            "bestTimeToVisit": "<Best Time To Visit>"
+          }
+        ]
+      }
+    ]  
 
 Ensure that the itinerary balances exploration with relaxation. Consider the preferences of {travelers} and the {budget} budget constraint while selecting hotels, activities, and attractions.
 `;
