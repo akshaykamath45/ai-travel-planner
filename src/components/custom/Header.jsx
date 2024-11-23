@@ -51,19 +51,23 @@ function Header() {
   };
   return (
     <div className="p-3 shadow-sm flex justify-between items-center px-5 ">
-      <div className="flex gap-2 items-center">
-        <img src="/logo.svg" />
-        <p>
-          <b>Roam.AI</b>
-        </p>
-      </div>
+      <a href="/">
+        <div className="flex gap-2 items-center">
+          <img src="/logo.svg" />
+          <p>
+            <b>Roam.AI</b>
+          </p>
+        </div>
+      </a>
 
       <div>
         {user ? (
           <div className="flex items-center gap-3">
-            <Button variant="outline" className="rounded-full">
-              My trips
-            </Button>
+            <a href="/my-trips">
+              <Button variant="outline" className="rounded-full">
+                My trips
+              </Button>
+            </a>
 
             <Popover>
               <PopoverTrigger>
