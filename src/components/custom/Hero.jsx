@@ -14,11 +14,11 @@ function Hero() {
         Crafting unique itineraries that suit to your interests and budget, I
         will act as your personal travel planner and curator.
       </p>
-      <Link to="/create-trip" >
+      <Link to="/create-trip" className="cursor-pointer">
         <Button>Get Started, It's Free</Button>
       </Link>
 
-      <img src="/landing.png" alt="landing_image"  className="-mt-20" />
+      <img src="/landing.png" alt="landing_image" className="-mt-[55px]" />
     </div>
   );
 }
