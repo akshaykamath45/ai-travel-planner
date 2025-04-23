@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import InfoSection from "../components/InfoSection";
-import { Hotel } from "lucide-react";
 import Hotels from "../components/Hotels";
 import PlacesToVisit from "../components/PlacesToVisit";
 

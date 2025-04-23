@@ -6,9 +6,13 @@ import { GetPlaceDetails, PHOTO_REF_URL } from "@/service/GlobalApi";
 import { useEffect, useState } from "react";
 function PlaceCardItem({ place }) {
   const [photoUrl, setPhotoUrl] = useState();
+  const [imageError, setImageError] = useState(false);
+
   useEffect(() => {
     place && getPlacePhoto();
+    setImageError(false);
   }, [place]);
+
   const getPlacePhoto = async () => {
     const data = {
       textQuery: place?.placeName,
@@ -20,6 +24,8 @@ function PlaceCardItem({ place }) {
         resp.data.places[0].photos[3].name
       );
       setPhotoUrl(photoUrl);
+    }).catch(() => {
+      setImageError(true);
     });
   };
   return (
@@ -29,9 +35,10 @@ function PlaceCardItem({ place }) {
     >
       <div className="border rounded-xl p-3 mt-2 flex gap-5 hover:scale-105 transition-all hover:shadow-md cursor-pointer">
         <img
-          src={photoUrl ? photoUrl : "/placeholder3.jpg"}
+          src={!imageError && photoUrl ? photoUrl : "/placeholder3.jpg"}
           alt="placeholder"
           className="w-[130px] h-[130px] rounded-xl object-cover"
+          onError={() => setImageError(true)}
         />
         <div>
           <h2 className="font-bold text-lg">{place?.placeName}</h2>

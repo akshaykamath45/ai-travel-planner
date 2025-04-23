@@ -25,7 +25,7 @@ export const SelectTravelersList = [
     title: "Friends",
     desc: "Adventure with Your Crew",
     icon: "🤝",
-    no: "5 to 10 People",
+    people: "5 to 10 People",
   },
 ];
 
@@ -50,49 +50,107 @@ export const SelectBudgetOptions = [
   },
 ];
 
+export const TravelTags = [
+  {
+    id: 1,
+    title: "Beaches",
+    icon: "🏖️",
+  },
+  {
+    id: 2,
+    title: "Mountains",
+    icon: "⛰️",
+  },
+  {
+    id: 3,
+    title: "Cultural",
+    icon: "🏛️",
+  },
+  {
+    id: 4,
+    title: "Adventure",
+    icon: "🏃‍♂️",
+  },
+  {
+    id: 5,
+    title: "Relaxation",
+    icon: "🧘‍♀️",
+  },
+  {
+    id: 6,
+    title: "Food & Dining",
+    icon: "🍽️",
+  },
+  {
+    id: 7,
+    title: "Historical",
+    icon: "🏺",
+  },
+  {
+    id: 8,
+    title: "Nature",
+    icon: "🌲",
+  }
+];
+
 export const AI_PROMPT = `
 Generate a detailed travel plan for the following criteria:
 
 - **Location:** {location}  
 - **Duration:** {noOfDays} days  
 - **Travelers:** {travelers}  
-- **Budget:** {budget}  
+- **Budget Category:** {budget}
+- **Budget Per Person:** {perPersonBudget} USD 
+- **Travel Preferences:** {travelTags}
 
 Please provide the result in the following JSON format:
 
-"hotelOptions": [
-      {
-        "hotelName": "<Hotel Name>",
-        "address": "<Hotel Address>",
-        "price": "<Price> per night",
-        "hotelImageURL": "<Hotel Image URL>",
-        "description": "<Hotel Description>",
-        "geoCoordinates": {
-          "latitude": <Latitude>,
-          "longitude": <Longitude>
-        },
-        "rating": <Rating>
-      }
-    ],
-"itinerary": [
-      {
-        "day": <Day Number>,
-        "dayPlan": [
-          {
-            "placeName": "<Place Name>",
-            "placeDetails": "<Place Details>",
-            "placeImageURL": "<Place Image URL>",
-            "geoCoordinates": {
-                "latitude": <Latitude>,
-                "longitude": <Longitude>
-            },
-            "ticketPricing": "<Ticket Pricing >",
-            "timeTravel": "<Time Travel>",
-            "bestTimeToVisit": "<Best Time To Visit>"
-          }
-        ]
-      }
-    ]  
+{
+  "tripSummary": "<A beautifully crafted summary of the entire trip, highlighting unique local experiences and hidden gems>",
+  "hotelOptions": [
+    {
+      "hotelName": "<Hotel Name>",
+      "address": "<Hotel Address>",
+      "price": "<Price> per night",
+      "hotelImageURL": "<Hotel Image URL>",
+      "description": "<Hotel Description>",
+      "geoCoordinates": {
+        "latitude": <Latitude>,
+        "longitude": <Longitude>
+      },
+      "rating": <Rating>
+    }
+  ],
+  "itinerary": [
+    {
+      "day": <Day Number>,
+      "dayPlan": [
+        {
+          "placeName": "<Place Name>",
+          "placeDetails": "<Place Details>",
+          "placeImageURL": "<Place Image URL>",
+          "geoCoordinates": {
+            "latitude": <Latitude>,
+            "longitude": <Longitude>
+          },
+          "ticketPricing": "<Ticket Pricing>",
+          "timeTravel": "<Time Travel>",
+          "bestTimeToVisit": "<Best Time To Visit>"
+        }
+      ]
+    }
+  ]
+}
 
-Ensure that the itinerary balances exploration with relaxation. Consider the preferences of {travelers} and the {budget} budget constraint while selecting hotels, activities, and attractions.
-`;
+
+
+Focus on creating an authentic travel experience that includes:
+1. Local hidden gems and off-the-beaten-path attractions
+2. Unique cultural experiences specific to the region
+3. Local food specialties and dining recommendations
+4. A mix of popular attractions and lesser-known spots
+5. Activities that match the selected travel preferences: {travelTags}
+
+Consider the preferences of {travelers} and balance the itinerary according to the selected travel tags. Ensure the recommendations stay within the {budget} budget category and {perPersonBudget} per person budget constraint.
+
+Note: The itinerary array MUST contain exactly {noOfDays} elements, with sequential day numbers from 1 to {noOfDays}.`;

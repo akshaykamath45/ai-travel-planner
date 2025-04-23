@@ -4,7 +4,9 @@ import {
   AI_PROMPT,
   SelectBudgetOptions,
   SelectTravelersList,
+  TravelTags
 } from "@/constants/options";
+import { Slider } from "@/components/ui/slider";
 import { chatSession } from "@/service/AIModal";
 import React, { useEffect } from "react";
 import { useState } from "react";
@@ -31,6 +33,8 @@ function CreateTrip() {
   const [formData, setFormData] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setIsLoading] = useState(false);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [perPersonBudget, setPerPersonBudget] = useState(100); // Initialize with default value
   const navigate = useNavigate();
 
   const handleInputChange = (name, value) => {
@@ -48,41 +52,42 @@ function CreateTrip() {
     },
     onError: (error) => console.log(error),
   });
-  const onGenerateTrip = async () => {
-    const user = localStorage.getItem("user");
-    if (!user) {
-      setOpenDialog(true);
-      return;
-    }
-    if (
-      !formData?.budget ||
-      !formData?.location ||
-      !formData?.noOfDays ||
-      !formData?.budget ||
-      !formData?.travelers
-    ) {
-      toast("Please fill all the fields");
-      return;
-    }
-    if (formData?.noOfDays > 15 || formData?.noOfDays <= 0) {
-      toast("Please enter correct number of days between 1 to 15");
-      return;
-    }
-    setIsLoading(true);
-    const FINAL_PROMPT = AI_PROMPT.replace(
-      "{location}",
-      formData?.location?.label
-    )
-      .replace("{noOfDays}", formData?.noOfDays)
-      .replace("{travelers}", formData?.travelers)
-      .replace("{budget}", formData?.budget)
-      .replace("{travelers}", formData?.travelers)
-      .replace("{budget}", formData?.budget);
-
-    const result = await chatSession.sendMessage(FINAL_PROMPT);
-    setIsLoading(false);
-    saveAiTrip(result?.response?.text());
-  };
+  // const onGenerateTrip = async () => {
+  //   const user = localStorage.getItem("user");
+  //   if (!user) {
+  //     setOpenDialog(true);
+  //     return;
+  //   }
+  //   if (
+  //     !formData?.budget ||
+  //     !formData?.location ||
+  //     !formData?.noOfDays ||
+  //     !formData?.budget ||
+  //     !formData?.travelers
+  //   ) {
+  //     toast("Please fill all the fields");
+  //     return;
+  //   }
+  //   if (formData?.noOfDays > 15 || formData?.noOfDays <= 0) {
+  //     toast("Please enter correct number of days between 1 to 15");
+  //     return;
+  //   }
+  //   setIsLoading(true);
+  //   const FINAL_PROMPT = AI_PROMPT.replace(
+  //     "{location}",
+  //     formData?.location?.label
+  //   )
+  //     .replace("{noOfDays}", formData?.noOfDays)
+  //     .replace("{travelers}", formData?.travelers)
+  //     .replace("{budget}", formData?.budget)
+  //     .replace("{travelers}", formData?.travelers)
+  //     .replace("{budget}", formData?.budget);
+  //   // console.log(FINAL_PROMPT);
+  //   const result = await chatSession.sendMessage(FINAL_PROMPT);
+  //   // console.log(result?.response?.text());
+  //   setIsLoading(false);
+  //   saveAiTrip(result?.response?.text());
+  // };
   const saveAiTrip = async (tripData) => {
     setIsLoading(true);
     const user = JSON.parse(localStorage.getItem("user"));
@@ -116,6 +121,65 @@ function CreateTrip() {
       .catch((error) => {
         console.error("Error fetching user profile:", error);
       });
+  };
+
+  const handleTagSelection = (tag) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter(t => t !== tag));
+    } else if (selectedTags.length < 3) {
+      setSelectedTags([...selectedTags, tag]);
+    } else {
+      toast("You can select up to 3 tags only");
+    }
+    handleInputChange("travelTags", selectedTags);
+  };
+
+  // Modify onGenerateTrip to include new parameters
+  const onGenerateTrip = async () => {
+    const user = localStorage.getItem("user");
+    if (!user) {
+      setOpenDialog(true);
+      return;
+    }
+    if (
+      !formData?.budget ||
+      !formData?.location ||
+      !formData?.noOfDays ||
+      !formData?.budget ||
+      !formData?.travelers
+    ) {
+      toast("Please fill all the fields");
+      return;
+    }
+    if (formData?.noOfDays > 15 || formData?.noOfDays <= 0) {
+      toast("Please enter correct number of days between 1 to 15");
+      return;
+    }
+    if (selectedTags.length === 0) {
+      toast("Please select at least one travel preference tag");
+      return;
+    }
+
+    setIsLoading(true);
+    const FINAL_PROMPT = AI_PROMPT.replace("{location}", formData?.location?.label)
+      .replace("{noOfDays}", formData?.noOfDays)
+      .replace("{travelers}", formData?.travelers)
+      .replace("{budget}", formData?.budget)
+      .replace("{perPersonBudget}", formData?.perPersonBudget)
+      .replace("{travelTags}", selectedTags.join(", "))
+      .replace("{travelTags}", selectedTags.join(", "))
+      .replace("{budget}", formData?.budget)
+      .replace("{travelers}", formData?.travelers)
+      .replace("{budget}", formData?.budget)
+      .replace("{perPersonBudget}", formData?.perPersonBudget)
+      .replace("{noOfDays}", formData?.noOfDays)
+      .replace("{noOfDays}", formData?.noOfDays);
+
+    console.log(FINAL_PROMPT);
+    const result = await chatSession.sendMessage(FINAL_PROMPT);
+    console.log(result?.response?.text());
+    setIsLoading(false);
+    saveAiTrip(result?.response?.text());
   };
 
   return (
@@ -152,8 +216,8 @@ function CreateTrip() {
           />
         </div>
         <div>
-          <h2 className="text-xl my-3 font-medium">What is your Budget </h2>
-          <div className="grid grid-cols-3 gap-5 mt`">
+          <h2 className="text-xl my-3 font-medium">What is your Budget</h2>
+          <div className="grid grid-cols-3 gap-5 mb-8">
             {SelectBudgetOptions.map((item, index) => (
               <div
                 key={index}
@@ -167,6 +231,24 @@ function CreateTrip() {
                 <h2 className="text-sm text-gray-500">{item.desc}</h2>
               </div>
             ))}
+          </div>
+          
+          <div className="mt-5">
+            <h2 className="text-lg mb-2">Budget per person (USD) for the entire trip</h2>
+            <div className="flex items-center gap-4">
+              <Slider
+                value={[perPersonBudget]}
+                onValueChange={(value) => {
+                  setPerPersonBudget(value[0]);
+                  handleInputChange("perPersonBudget", value[0]); // Add this line to update formData
+                }}
+                min={100}
+                max={2000}
+                step={50}
+                className="w-full"
+              />
+              <span className="min-w-[60px] text-right">${perPersonBudget}</span>
+            </div>
           </div>
         </div>
         <div>
@@ -190,8 +272,27 @@ function CreateTrip() {
             ))}
           </div>
         </div>
+        <div>
+          <h2 className="text-xl my-3 font-medium">
+            Select your travel preferences (up to 3)
+          </h2>
+          <div className="grid grid-cols-4 gap-3">
+            {TravelTags.map((tag) => (
+              <div
+                key={tag.id}
+                className={`p-3 border rounded-lg hover:shadow-lg cursor-pointer ${
+                  selectedTags.includes(tag.title) ? "shadow-lg border-black" : ""
+                }`}
+                onClick={() => handleTagSelection(tag.title)}
+              >
+                <h2 className="text-2xl">{tag.icon}</h2>
+                <h2 className="font-medium">{tag.title}</h2>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-      <div className="my-10 justify-end flex">
+      <div className="my-14 justify-end flex">
         <Button disabled={loading} onClick={onGenerateTrip}>
           {loading ? (
             <AiOutlineLoading3Quarters className="h-7 w-7 animate-spin" />
@@ -200,7 +301,7 @@ function CreateTrip() {
           )}
         </Button>
       </div>
-      <Dialog open={openDialog}>
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogDescription>

@@ -6,8 +6,11 @@ import { Link } from "react-router-dom";
 
 function UserTripCard({ trip }) {
   const [photoUrl, setPhotoUrl] = useState();
+  const [imageError, setImageError] = useState(false);
+
   useEffect(() => {
     trip && getPlacePhoto();
+    setImageError(false);
   }, [trip]);
   const getPlacePhoto = async () => {
     const data = {
@@ -20,6 +23,8 @@ function UserTripCard({ trip }) {
         resp.data.places[0].photos[3].name
       );
       setPhotoUrl(photoUrl);
+    }).catch(() => {
+      setImageError(true);
     });
   };
   return (
@@ -27,8 +32,10 @@ function UserTripCard({ trip }) {
       {" "}
       <div className="hover:scale-105 transition-all ">
         <img
-          src={photoUrl ? photoUrl : "/placeholder3.jpg"}
+          src={!imageError && photoUrl ? photoUrl : "/placeholder3.jpg"}
           className="object-cover rounded-xl h-[220px] w-full"
+          alt="trip-cover"
+          onError={() => setImageError(true)}
         ></img>
         <div>
           <h2 className="font-bold text-lg">
