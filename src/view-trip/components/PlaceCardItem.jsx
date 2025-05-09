@@ -237,13 +237,37 @@ function PlaceCardItem({ place, onPlaceChange }) {
                   disabled={!selectedPlace}
                   onClick={async () => {
                     if (selectedPlace) {
-                      await getPlacePhoto();
-                      onPlaceChange(selectedPlace);
-                      setFeedbackStatus('🤩🙁');
-                      setOpenFeedbackDialog(false);
-                      setShowAlternatives(false);
-                      setSelectedPlace(null);
-                      toast.success('Place updated successfully!');
+                      toast.loading('Updating place...');
+                      try {
+                        // Update the place details
+                        const data = {
+                          textQuery: selectedPlace.placeName,
+                        };
+                        const result = await GetPlaceDetails(data);
+                        const newPhotoUrl = PHOTO_REF_URL.replace(
+                          "{NAME}",
+                          result.data.places[0].photos[3].name
+                        );
+                        
+                        // Update the place in parent component
+                        onPlaceChange({
+                          ...selectedPlace,
+                          photoUrl: newPhotoUrl
+                        });
+
+                        // Reset feedback status and close dialog
+                        setFeedbackStatus('🤩🙁');
+                        setOpenFeedbackDialog(false);
+                        setShowAlternatives(false);
+                        setSelectedPlace(null);
+                        
+                        toast.dismiss();
+                        toast.success('Place updated successfully!');
+                      } catch (error) {
+                        console.error('Error updating place:', error);
+                        toast.dismiss();
+                        toast.error('Failed to update place. Please try again.');
+                      }
                     }
                   }}
                 >
